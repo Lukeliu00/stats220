@@ -1,0 +1,54 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+h2 { color: #2C3E50; }
+h3 { color: #34495E; }
+body { font-family: Arial, sans-serif; }
+```
+
+## Video Ad Observational Log
+
+This report tracks the duration, category, and platform of video ads observed over a period of time to analyze ad targeting patterns.
+
+```{r data-processing}
+library(tidyverse)
+
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vSiM8F7-aJbglX-NMVXyOHHNrsePJy--w0ri93hw29IIaHvyePpGyko-AruIjQ-sCGJQ1qdLCikVwrU/pub?gid=1051762404&single=true&output=csv")
+
+latest_data <- logged_data %>%
+  rename(
+    duration_sec = `What was the exact duration of the video ad in seconds?`,
+    ad_category = `Which of the following best describes the primary industry or product category of the ad?`,
+    platform = `On which platform did you encounter this ad?`
+  )
+
+total_n <- nrow(latest_data)
+avg_len <- round(mean(latest_data$duration_sec, na.rm = TRUE), 1)
+```
+
+### Summary Statistics
+Based on the collected data, I recorded a total of `r total_n` ad observations. The average duration of these video ads was `r avg_len` seconds.
+
+### Ad Categories
+```{r plot-category}
+ggplot(data = latest_data, aes(x = ad_category)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Frequency of Ad Categories", x = "Category", y = "Count") +
+  theme_minimal()
+```
+
+### Ad Platforms
+```{r plot-platform}
+ggplot(data = latest_data, aes(x = platform)) +
+  geom_bar(fill = "coral") +
+  labs(title = "Distribution of Ad Platforms", x = "Platform", y = "Count") +
+  theme_minimal()
+```
